@@ -5,6 +5,7 @@ import { messageRouter } from "./message-router";
 import { chatRouter } from "./chat-router";
 import { adminRouter } from "./admin-router";
 import { createRouter, publicQuery } from "./middleware";
+import stripeRouter from "./stripe-router";
 
 export const appRouter = createRouter({
   ping: publicQuery.query(() => ({ ok: true, ts: Date.now() })),
@@ -14,6 +15,7 @@ export const appRouter = createRouter({
   message: messageRouter,
   chat: chatRouter,
   admin: adminRouter,
+  stripe: stripeRouter,
 });
 
 export type AppRouter = typeof appRouter;
