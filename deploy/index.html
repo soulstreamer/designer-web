@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Designer-Web.ro</title>
+    <script>
+      // Check if running from file:// protocol
+      if (window.location.protocol === 'file:') {
+        document.write(`
+          <div style="font-family: Arial, sans-serif; padding: 50px; text-align: center; background: #050505; color: white; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <h1 style="color: #8B00FF; margin-bottom: 20px;">⚠️ Cannot Open Directly</h1>
+            <p style="font-size: 18px; margin-bottom: 30px; max-width: 600px; line-height: 1.6;">
+              This website requires a local server to run properly due to browser security restrictions.
+            </p>
+            <div style="background: #1a1a1a; padding: 30px; border-radius: 10px; text-align: left; max-width: 600px; border: 1px solid #8B00FF;">
+              <h3 style="color: #8B00FF; margin-top: 0;">Choose a method to view:</h3>
+              
+              <h4 style="color: white; margin-top: 20px;">🔷 Windows (Easiest):</h4>
+              <p>Double-click <strong>start-server.bat</strong> then open http://localhost:8000</p>
+              
+              <h4 style="color: white; margin-top: 20px;">🍎 Mac/Linux:</h4>
+              <p>Run in terminal: <code style="background: #333; padding: 5px 10px; border-radius: 4px;">python3 -m http.server 8000</code></p>
+              
+              <h4 style="color: white; margin-top: 20px;">💻 VS Code:</h4>
+              <p>Install "Live Server" extension, right-click index.html → "Open with Live Server"</p>
+              
+              <h4 style="color: white; margin-top: 20px;">📦 Node.js:</h4>
+              <p>Run: <code style="background: #333; padding: 5px 10px; border-radius: 4px;">npx serve</code></p>
+            </div>
+            <p style="margin-top: 30px; color: #888;">
+              Read README.md for more details
+            </p>
+          </div>
+        `);
+        throw new Error('File protocol not supported');
+      }
+    </script>
+    <script type="module" crossorigin src="./assets/index-Cx6GdwAM.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-4_LsRmdT.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

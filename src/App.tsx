@@ -9,6 +9,8 @@ import Mentenanta from './pages/Mentenanta'
 import FAQ from './pages/FAQ'
 import PoliticaConfidentialitate from './pages/PoliticaConfidentialitate'
 import TermeniConditii from './pages/TermeniConditii'
+import PaymentSuccess from './pages/PaymentSuccess'
+import PaymentCancel from './pages/PaymentCancel'
 
 export default function App() {
   return (
@@ -22,6 +24,8 @@ export default function App() {
       <Route path="/faq" element={<FAQ />} />
       <Route path="/politica-de-confidentialitate" element={<PoliticaConfidentialitate />} />
       <Route path="/termeni-si-conditii" element={<TermeniConditii />} />
+      <Route path="/success" element={<PaymentSuccess />} />
+      <Route path="/cancel" element={<PaymentCancel />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )

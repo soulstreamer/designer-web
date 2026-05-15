@@ -81,6 +81,16 @@ const translations = {
     'services.error_name': 'Numele este obligatoriu',
     'services.error_phone': 'Numărul de telefon este obligatoriu',
     'services.error_phone_digits': 'Numărul trebuie să aibă exact 10 cifre',
+    'services.pay_now': 'Plătește Acum',
+    'services.cancel': 'Anulează',
+    
+    // Payment
+    'payment.success_title': 'Plată Reușită!',
+    'payment.success_message': 'Mulțumim pentru plată! Un designer te va contacta în cel mai scurt timp pentru a discuta detaliile proiectului tău.',
+    'payment.cancel_title': 'Plată Anulată',
+    'payment.cancel_message': 'Plata a fost anulată. Dacă ai întrebări sau dorești să încerci din nou, nu ezita să ne contactezi.',
+    'payment.back_home': 'Înapoi la Pagina Principală',
+    'payment.contact_support': 'Contactează-ne',
     
     // About
     'about.subtitle': 'Despre Noi',
@@ -304,6 +314,16 @@ const translations = {
     'services.error_name': 'Name is required',
     'services.error_phone': 'Phone number is required',
     'services.error_phone_digits': 'Phone number must have exactly 10 digits',
+    'services.pay_now': 'Pay Now',
+    'services.cancel': 'Cancel',
+    
+    // Payment
+    'payment.success_title': 'Payment Successful!',
+    'payment.success_message': 'Thank you for your payment! A designer will contact you shortly to discuss your project details.',
+    'payment.cancel_title': 'Payment Cancelled',
+    'payment.cancel_message': 'The payment was cancelled. If you have any questions or would like to try again, please don\'t hesitate to contact us.',
+    'payment.back_home': 'Back to Home',
+    'payment.contact_support': 'Contact Us',
     
     // About
     'about.subtitle': 'About Us',

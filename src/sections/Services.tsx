@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react';
-import { Monitor, ShoppingCart, Check, User, Phone } from 'lucide-react';
+import { Monitor, ShoppingCart, Check, User, Phone, CreditCard } from 'lucide-react';
 import { trpc } from '@/providers/trpc';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getPaymentLink } from '@/lib/stripe';
 
 interface ProductFormData {
   name: string;
@@ -85,8 +86,7 @@ export default function Services() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent, type: 'prezentare' | 'magazin') => {
-    e.preventDefault();
+  const handlePayment = (type: 'prezentare' | 'magazin') => {
     const form = type === 'prezentare' ? prezentareForm : magazinForm;
     const setErrors = type === 'prezentare' ? setPrezentareErrors : setMagazinErrors;
     
@@ -101,12 +101,24 @@ export default function Services() {
     setErrors(newErrors);
 
     if (!newErrors.name && !newErrors.phone) {
+      // Submit contact form first
       submitContact.mutate({
         name: form.name,
         phone: form.phone,
         service: type,
-        message: '',
+        message: `Payment initiated for ${type === 'prezentare' ? 'Landing Page' : 'Online Store'}`,
       });
+
+      // Redirect to Stripe Payment Link
+      const paymentUrl = getPaymentLink(type);
+      
+      // Add customer info to the URL as query parameters
+      const url = new URL(paymentUrl);
+      url.searchParams.append('prefilled_email', '');
+      url.searchParams.append('client_reference_id', `${form.name}-${form.phone}`);
+      
+      // Open Stripe in new tab
+      window.open(url.toString(), '_blank');
     }
   };
 
@@ -198,7 +210,7 @@ export default function Services() {
 
               {showPrezentareForm ? (
                 <div className="w-full p-6 bg-white/90 rounded-lg border border-white/20">
-                  <form onSubmit={(e) => handleSubmit(e, 'prezentare')} className="space-y-4">
+                  <div className="space-y-4">
                     <div>
                       <div className="relative">
                         <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B00FF]" />
@@ -228,14 +240,24 @@ export default function Services() {
                       {prezentareErrors.phone && <p className="text-red-500 text-xs mt-1">{prezentareErrors.phone}</p>}
                       <p className="text-[#999] text-xs mt-1">{phoneCountText}</p>
                     </div>
+                    
+                    {/* Stripe Payment Button */}
                     <button
-                      type="submit"
+                      onClick={() => handlePayment('prezentare')}
                       disabled={submitContact.isPending || !isFormValid(prezentareForm)}
-                      className="w-full py-3 bg-[#8B00FF] text-white font-semibold text-sm uppercase rounded-md hover:bg-[#6B00CC] disabled:opacity-50"
+                      className="w-full py-3 bg-gradient-to-r from-[#8B00FF] to-[#6B00CC] text-white font-semibold text-sm uppercase rounded-md hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
-                      {submitContact.isPending ? (t('services.sending') as string) : (t('services.submit') as string)}
+                      <CreditCard size={18} />
+                      {submitContact.isPending ? (t('services.sending') as string) : (t('services.pay_now') as string || 'Plătește Acum')}
                     </button>
-                  </form>
+                    
+                    <button
+                      onClick={() => setShowPrezentareForm(false)}
+                      className="w-full py-2 text-[#888] text-sm hover:text-white transition-colors"
+                    >
+                      {t('services.cancel') as string || 'Anulează'}
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <button
@@ -290,7 +312,7 @@ export default function Services() {
 
               {showMagazinForm ? (
                 <div className="w-full p-6 bg-white/90 rounded-lg border border-white/20">
-                  <form onSubmit={(e) => handleSubmit(e, 'magazin')} className="space-y-4">
+                  <div className="space-y-4">
                     <div>
                       <div className="relative">
                         <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B00FF]" />
@@ -320,14 +342,24 @@ export default function Services() {
                       {magazinErrors.phone && <p className="text-red-500 text-xs mt-1">{magazinErrors.phone}</p>}
                       <p className="text-[#999] text-xs mt-1">{magazinPhoneCountText}</p>
                     </div>
+                    
+                    {/* Stripe Payment Button */}
                     <button
-                      type="submit"
+                      onClick={() => handlePayment('magazin')}
                       disabled={submitContact.isPending || !isFormValid(magazinForm)}
-                      className="w-full py-3 bg-[#8B00FF] text-white font-semibold text-sm uppercase rounded-md hover:bg-[#6B00CC] disabled:opacity-50"
+                      className="w-full py-3 bg-gradient-to-r from-[#8B00FF] to-[#6B00CC] text-white font-semibold text-sm uppercase rounded-md hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
-                      {submitContact.isPending ? (t('services.sending') as string) : (t('services.submit') as string)}
+                      <CreditCard size={18} />
+                      {submitContact.isPending ? (t('services.sending') as string) : (t('services.pay_now') as string || 'Plătește Acum')}
                     </button>
-                  </form>
+                    
+                    <button
+                      onClick={() => setShowMagazinForm(false)}
+                      className="w-full py-2 text-[#888] text-sm hover:text-white transition-colors"
+                    >
+                      {t('services.cancel') as string || 'Anulează'}
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <button
