@@ -219,7 +219,7 @@ const translations = {
     'privacy.sec4_title': '4. Partajarea Informațiilor',
     'privacy.sec4': 'Nu vindem, nu închiriem și nu împărtășim informațiile dumneavoastră personale cu terți pentru scopuri de marketing. Putem dezvălui informații doar atunci când este cerut de lege sau pentru a ne proteja drepturile.',
     'privacy.sec5_title': '5. Drepturile Dumneavoastră',
-    'privacy.sec5': 'Aveți dreptul de a accesa, modifica sau șterge informațiile personale pe care le deținem despre dumneavoastră. Pentru orice solicitare, ne puteți contacta la contact@designer-web.ro.',
+    'privacy.sec5': 'Aveți dreptul de a accesa, modifica sau șterge informațiile personale pe care le deținem despre dumneavoastră. Pentru orice solicitare, ne puteți contacta la designerwebinquiry@gmail.com.',
     
     // Terms Page
     'terms.title': 'Termeni și Condiții',
@@ -442,7 +442,7 @@ const translations = {
     'privacy.sec4_title': '4. Information Sharing',
     'privacy.sec4': 'We do not sell, rent or share your personal information with third parties for marketing purposes. We may disclose information only when required by law or to protect our rights.',
     'privacy.sec5_title': '5. Your Rights',
-    'privacy.sec5': 'You have the right to access, modify or delete the personal information we hold about you. For any request, you can contact us at contact@designer-web.ro.',
+    'privacy.sec5': 'You have the right to access, modify or delete the personal information we hold about you. For any request, you can contact us at designerwebinquiry@gmail.com.',
     
     // Terms Page
     'terms.title': 'Terms and Conditions',

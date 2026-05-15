@@ -107,8 +107,8 @@ export default function Contact() {
 
               <div className="flex items-center gap-4">
                 <Mail size={20} className="text-[#8B00FF] flex-shrink-0" />
-                <a href="mailto:contact@designer-web.ro" className="text-white text-base hover:text-[#8B00FF] transition-colors">
-                  contact@designer-web.ro
+                <a href="mailto:designerwebinquiry@gmail.com" className="text-white text-base hover:text-[#8B00FF] transition-colors">
+                  designerwebinquiry@gmail.com
                 </a>
               </div>
             </div>

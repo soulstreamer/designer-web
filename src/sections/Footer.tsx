@@ -115,7 +115,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               <li className="text-[#888] text-sm">Alexandria, Teleorman</li>
               <li className="text-[#888] text-sm">{language === 'en' ? '+40 767 494 319' : '0767 494 319'}</li>
-              <li className="text-[#888] text-sm">contact@designer-web.ro</li>
+              <li className="text-[#888] text-sm">designerwebinquiry@gmail.com</li>
             </ul>
           </div>
         </div>
