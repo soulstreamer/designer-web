@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 2%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 274 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 274 30% 15%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 274 10% 15%;
+    --muted-foreground: 0 0% 53%;
+    --accent: 274 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 274 10% 15%;
+    --input: 274 10% 15%;
+    --ring: 274 100% 50%;
+    --radius: 0.5rem;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: #050505;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
+@layer components {
+  .text-gradient-purple {
+    background: linear-gradient(135deg, #8B00FF, #E9D5FF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 20px rgba(139, 0, 255, 0.4), 0 0 40px rgba(139, 0, 255, 0.2), 0 0 60px rgba(139, 0, 255, 0.1);
+  }
+
+  .glow-purple-subtle {
+    box-shadow: 0 0 15px rgba(139, 0, 255, 0.2), 0 0 30px rgba(139, 0, 255, 0.1);
+  }
+
+  .glow-text {
+    text-shadow: 0 0 10px rgba(139, 0, 255, 0.6), 0 0 20px rgba(139, 0, 255, 0.3), 0 0 40px rgba(139, 0, 255, 0.15);
+  }
+
+  .section-divider {
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #8B00FF, transparent);
+    margin: 0 auto;
+    border-radius: 2px;
+  }
+}
