@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router';
-import { ArrowLeft, Lock, Shield } from 'lucide-react';
+import { ArrowLeft, Lock, Shield, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { loadStripe } from '@stripe/stripe-js';
 import {
@@ -9,11 +9,13 @@ import {
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
-import { trpc } from '@/providers/trpc';
 import { toast } from 'sonner';
 
 // Load Stripe outside of components to avoid recreating the Stripe object
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
+const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+console.log('Stripe Key available:', stripeKey ? 'Yes (starts with ' + stripeKey.substring(0, 10) + '...)' : 'No');
+
+const stripePromise = loadStripe(stripeKey || '');
 
 interface CheckoutFormProps {
   productType: string;
@@ -46,13 +48,21 @@ function CheckoutForm({ productType, productName, productPhone, amount, currency
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
   const [clientSecret, setClientSecret] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const [name, setName] = useState(productName);
   const [phone, setPhone] = useState(productPhone);
+  const [cardComplete, setCardComplete] = useState(false);
 
   // Create payment intent on mount
   useEffect(() => {
     const createPaymentIntent = async () => {
       try {
+        setIsLoading(true);
+        setError('');
+        
+        console.log('Creating payment intent...', { amount, currency, type: productType });
+        
         const response = await fetch('/api/stripe/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -66,24 +76,34 @@ function CheckoutForm({ productType, productName, productPhone, amount, currency
         });
 
         if (!response.ok) {
-          throw new Error('Failed to create payment intent');
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
+        console.log('Payment intent created:', data.clientSecret ? 'Success' : 'Failed');
         setClientSecret(data.clientSecret);
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Error creating payment intent:', error);
+        setError(language === 'ro' 
+          ? 'Eroare la inițializarea plății. Verifică conexiunea sau încearcă mai târziu.' 
+          : 'Error initializing payment. Check connection or try again later.');
         toast.error(language === 'ro' ? 'Eroare la inițializarea plății' : 'Error initializing payment');
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    createPaymentIntent();
+    if (amount && currency) {
+      createPaymentIntent();
+    }
   }, [amount, currency, name, phone, productType, language]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!stripe || !elements) {
+      toast.error(language === 'ro' ? 'Stripe nu este încărcat' : 'Stripe is not loaded');
       return;
     }
 
@@ -97,40 +117,81 @@ function CheckoutForm({ productType, productName, productPhone, amount, currency
       return;
     }
 
-    setIsProcessing(true);
-
-    const { error: submitError } = await elements.submit();
-    if (submitError) {
-      toast.error(submitError.message);
-      setIsProcessing(false);
+    if (!cardComplete) {
+      toast.error(language === 'ro' ? 'Completează datele cardului' : 'Please complete card details');
       return;
     }
 
-    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: elements.getElement(CardElement)!,
-        billing_details: {
-          name: name,
-          phone: phone,
-        },
-      },
-    });
+    setIsProcessing(true);
 
-    if (error) {
-      toast.error(error.message || (language === 'ro' ? 'Plată eșuată' : 'Payment failed'));
+    try {
+      const { error: submitError } = await elements.submit();
+      if (submitError) {
+        toast.error(submitError.message);
+        setIsProcessing(false);
+        return;
+      }
+
+      const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardElement)!,
+          billing_details: {
+            name: name,
+            phone: phone,
+          },
+        },
+      });
+
+      if (confirmError) {
+        toast.error(confirmError.message || (language === 'ro' ? 'Plată eșuată' : 'Payment failed'));
+        setIsProcessing(false);
+      } else if (paymentIntent.status === 'succeeded') {
+        toast.success(language === 'ro' ? 'Plată reușită!' : 'Payment successful!');
+        navigate(`/success?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`);
+      }
+    } catch (err) {
+      console.error('Payment error:', err);
+      toast.error(language === 'ro' ? 'A apărut o eroare' : 'An error occurred');
       setIsProcessing(false);
-    } else if (paymentIntent.status === 'succeeded') {
-      toast.success(language === 'ro' ? 'Plată reușită!' : 'Payment successful!');
-      navigate(`/success?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`);
     }
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#635bff]"></div>
+        <p className="mt-4 text-gray-600">
+          {language === 'ro' ? 'Se pregătește plata...' : 'Preparing payment...'}
+        </p>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+        <p className="text-red-600 mb-4">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-6 py-2 bg-[#635bff] text-white rounded-md hover:bg-[#4f49cc] transition-colors"
+        >
+          {language === 'ro' ? 'Încearcă din nou' : 'Try again'}
+        </button>
+      </div>
+    );
+  }
+
+  const isFormValid = stripe && clientSecret && name.trim() && phone.replace(/\D/g, '').length >= 10 && cardComplete;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Name */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {language === 'ro' ? 'Nume complet' : 'Full name'}
+          {language === 'ro' ? 'Nume complet' : 'Full name'} *
         </label>
         <input
           type="text"
@@ -145,7 +206,7 @@ function CheckoutForm({ productType, productName, productPhone, amount, currency
       {/* Phone */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {language === 'ro' ? 'Număr de telefon' : 'Phone number'}
+          {language === 'ro' ? 'Număr de telefon' : 'Phone number'} *
         </label>
         <input
           type="tel"
@@ -155,27 +216,45 @@ function CheckoutForm({ productType, productName, productPhone, amount, currency
           className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#635bff] focus:border-transparent text-gray-900 placeholder-gray-400"
           required
         />
+        {phone && phone.replace(/\D/g, '').length < 10 && (
+          <p className="text-xs text-red-500 mt-1">
+            {language === 'ro' ? 'Numărul trebuie să aibă 10 cifre' : 'Number must have 10 digits'}
+          </p>
+        )}
       </div>
 
       {/* Card Element */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {language === 'ro' ? 'Informații card' : 'Card information'}
+          {language === 'ro' ? 'Informații card' : 'Card information'} *
         </label>
-        <div className="border border-gray-300 rounded-md p-3 focus-within:ring-2 focus-within:ring-[#635bff] focus-within:border-transparent">
-          <CardElement options={cardElementOptions} />
+        <div className={`border rounded-md p-3 transition-all ${cardComplete ? 'border-green-500 ring-1 ring-green-500' : 'border-gray-300 focus-within:ring-2 focus-within:ring-[#635bff] focus-within:border-transparent'}`}>
+          <CardElement 
+            options={cardElementOptions}
+            onChange={(event) => {
+              setCardComplete(event.complete);
+              if (event.error) {
+                toast.error(event.error.message);
+              }
+            }}
+          />
         </div>
         <p className="text-xs text-gray-500 mt-1">
           {language === 'ro' 
-            ? 'Cardul este procesat securizat prin Stripe'
-            : 'Card is securely processed through Stripe'}
+            ? 'Test card: 4242 4242 4242 4242, orice dată viitoare, orice CVC'
+            : 'Test card: 4242 4242 4242 4242, any future date, any CVC'}
         </p>
+        {!cardComplete && (
+          <p className="text-xs text-amber-600 mt-1">
+            {language === 'ro' ? 'Completează datele cardului' : 'Please complete card details'}
+          </p>
+        )}
       </div>
 
       {/* Submit Button */}
       <button
         type="submit"
-        disabled={!stripe || isProcessing || !clientSecret}
+        disabled={!isFormValid || isProcessing}
         className="w-full py-4 bg-[#635bff] text-white font-semibold rounded-md hover:bg-[#4f49cc] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
       >
         {isProcessing ? (
@@ -193,6 +272,14 @@ function CheckoutForm({ productType, productName, productPhone, amount, currency
           </>
         )}
       </button>
+      
+      {!isFormValid && !isProcessing && (
+        <p className="text-xs text-center text-gray-500">
+          {language === 'ro' 
+            ? 'Completează toate câmpurile pentru a continua'
+            : 'Complete all fields to continue'}
+        </p>
+      )}
     </form>
   );
 }
