@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react';
 import { Monitor, ShoppingCart, Check, User, Phone, CreditCard } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import { trpc } from '@/providers/trpc';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getPaymentLink } from '@/lib/stripe';
 
 interface ProductFormData {
   name: string;
@@ -18,6 +18,7 @@ interface ProductFormErrors {
 export default function Services() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
+  const navigate = useNavigate();
   
   const [prezentareForm, setPrezentareForm] = useState<ProductFormData>({ name: '', phone: '' });
   const [prezentareErrors, setPrezentareErrors] = useState<ProductFormErrors>({ name: '', phone: '' });
@@ -101,24 +102,8 @@ export default function Services() {
     setErrors(newErrors);
 
     if (!newErrors.name && !newErrors.phone) {
-      // Submit contact form first
-      submitContact.mutate({
-        name: form.name,
-        phone: form.phone,
-        service: type,
-        message: `Payment initiated for ${type === 'prezentare' ? 'Landing Page' : 'Online Store'}`,
-      });
-
-      // Redirect to Stripe Payment Link
-      const paymentUrl = getPaymentLink(type);
-      
-      // Add customer info to the URL as query parameters
-      const url = new URL(paymentUrl);
-      url.searchParams.append('prefilled_email', '');
-      url.searchParams.append('client_reference_id', `${form.name}-${form.phone}`);
-      
-      // Open Stripe in new tab
-      window.open(url.toString(), '_blank');
+      // Navigate to custom checkout page with customer info
+      navigate(`/checkout?type=${type}&name=${encodeURIComponent(form.name)}&phone=${encodeURIComponent(form.phone)}`);
     }
   };
 

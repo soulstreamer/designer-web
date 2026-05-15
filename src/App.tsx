@@ -11,6 +11,7 @@ import PoliticaConfidentialitate from './pages/PoliticaConfidentialitate'
 import TermeniConditii from './pages/TermeniConditii'
 import PaymentSuccess from './pages/PaymentSuccess'
 import PaymentCancel from './pages/PaymentCancel'
+import Checkout from './pages/Checkout'
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
       <Route path="/termeni-si-conditii" element={<TermeniConditii />} />
       <Route path="/success" element={<PaymentSuccess />} />
       <Route path="/cancel" element={<PaymentCancel />} />
+      <Route path="/checkout" element={<Checkout />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )
