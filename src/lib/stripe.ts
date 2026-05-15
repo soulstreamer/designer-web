@@ -56,9 +56,9 @@ export const redirectToCheckout = async (priceId: string, formData: { name: stri
 
 // Alternative: Use Stripe Payment Links (easier for frontend-only)
 export const getPaymentLink = (type: 'prezentare' | 'magazin') => {
-  // Your Stripe Payment Links
+  // Your Stripe Payment Links (test mode)
   const paymentLinks = {
-    prezentare: 'https://buy.stripe.com/5kQbJ1cYZ3yMeTXdGH5Ne00',
+    prezentare: 'https://buy.stripe.com/test_5kQbJ1cYZ3yMeTXdGH5Ne00',
     magazin: 'https://buy.stripe.com/28E7sL3opd9m5jneKL5Ne01',
   };
   
